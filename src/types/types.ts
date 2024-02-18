@@ -6,11 +6,24 @@ export type UserType = {
   index: number;
 };
 
-export type NewUserType = Omit<UserType, 'index'>;
+export type ResponseUserType = Omit<UserType, 'index'>;
 
 export type InputType = {
   type: ResponseTypeEnum;
-  data: unknown;
+  data: WsResponse;
   id: 0;
-  [key: string]: unknown;
+};
+
+export type WsResponse = ResponseUserType;
+export type WsRequest = RequestUserType;
+
+export type RequestUserType = {
+  type: 'reg';
+  data: {
+    name: string;
+    index: number;
+    error: boolean;
+    errorText: string;
+  };
+  id: 0;
 };

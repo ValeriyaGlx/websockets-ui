@@ -1,22 +1,24 @@
-import { ResponseTypeEnum } from '../types';
+/* eslint-disable no-unused-vars */
+import { addUser } from '../models';
+import { ResponseTypeEnum, WsRequest, WsResponse } from '../types';
 
-export const handlers: Record<ResponseTypeEnum, () => void> = {
-  [ResponseTypeEnum.Registration]: () => {
-    console.log('work registration');
+export const handlers: Record<ResponseTypeEnum, (data: WsResponse) => string> = {
+  [ResponseTypeEnum.Registration]: (data) => {
+    return addUser(data);
   },
-  [ResponseTypeEnum.CreateGame]: function (): void {
+  [ResponseTypeEnum.CreateGame]: function (): string {
     throw new Error('Function not implemented.');
   },
-  [ResponseTypeEnum.StartGame]: function (): void {
+  [ResponseTypeEnum.StartGame]: function (): string {
     throw new Error('Function not implemented.');
   },
-  [ResponseTypeEnum.Turn]: function (): void {
+  [ResponseTypeEnum.Turn]: function (): string {
     throw new Error('Function not implemented.');
   },
-  [ResponseTypeEnum.Attack]: function (): void {
+  [ResponseTypeEnum.Attack]: function (): string {
     throw new Error('Function not implemented.');
   },
-  [ResponseTypeEnum.Finish]: function (): void {
+  [ResponseTypeEnum.Finish]: function (): string {
     throw new Error('Function not implemented.');
   },
 };

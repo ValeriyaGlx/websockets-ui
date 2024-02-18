@@ -29,12 +29,10 @@ wss.on('connection', (ws: WebSocket) => {
 
     const handler = handlers[parsedMessage.type];
     if (handler) {
-      handler();
+      const req = handler(parsedMessage.data);
+      console.log(req);
+      ws.send(req);
     }
-
-    console.log(parsedMessage.type);
-
-    ws.send(message);
   });
 
   ws.on('close', () => {
