@@ -3,17 +3,29 @@
     "version": "1.0.0",
     "description": "Template for the WebSocket remote control task",
     "main": "index.js",
-    "type": "module",
     "scripts": {
-        "start": "node ./index.js",
-        "start:dev": "nodemon ./index.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "start": "node ./index.ts",
+        "start:dev": "nodemon ./src/index.ts",
+        "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
+        "lint:fix": "eslint --fix --ext ts && npm run format:fix",
+        "format": "prettier \"./**/*.{ts,css}\"",
+        "format:fix": "prettier --write \"./**/*.{ts,css}\""
     },
     "author": "Andrei Auchynnikau",
     "keywords": [],
     "license": "ISC",
     "devDependencies": {
-        "nodemon": "^2.0.16"
+        "@types/node": "^20.11.19",
+        "@typescript-eslint/eslint-plugin": "^7.0.1",
+        "@typescript-eslint/parser": "^7.0.1",
+        "eslint": "^8.56.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-prettier": "^5.1.3",
+        "nodemon": "^2.0.22",
+        "prettier": "^3.2.5",
+        "ts-node": "^10.9.2",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.3.3"
     },
     "dependencies": {
         "ws": "^8.8.0"
