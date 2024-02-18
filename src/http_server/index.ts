@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import http from 'http';
+import WebSocket from 'ws';
+import { handlers } from '../handlers/handlers';
+import { parseMessage } from '../utils/parseMessage';
 
 export const httpServer = http.createServer(function (req, res) {
   const __dirname = path.resolve(path.dirname(''));
@@ -13,5 +16,28 @@ export const httpServer = http.createServer(function (req, res) {
     }
     res.writeHead(200);
     res.end(data);
+  });
+});
+
+const wss = new WebSocket.Server({ port: 3000 });
+
+wss.on('connection', (ws: WebSocket) => {
+  console.log('New client connected');
+
+  ws.on('message', (message: string) => {
+    const parsedMessage = parseMessage(message);
+
+    const handler = handlers[parsedMessage.type];
+    if (handler) {
+      handler();
+    }
+
+    console.log(parsedMessage.type);
+
+    ws.send(message);
+  });
+
+  ws.on('close', () => {
+    console.log('Client disconnected');
   });
 });
