@@ -1,24 +1,25 @@
 /* eslint-disable no-unused-vars */
-import { addUser } from '../models';
+import { addUser, updateWinners } from '../models';
 import { ResponseTypeEnum, WsRequest, WsResponse } from '../types';
 
-export const handlers: Record<ResponseTypeEnum, (data: WsResponse) => string> = {
+// TODO: change Type
+export const handlers: Record<ResponseTypeEnum, (data: WsResponse) => { [key: string]: string }> = {
   [ResponseTypeEnum.Registration]: (data) => {
-    return addUser(data);
+    return { user: addUser(data), winners: updateWinners() };
   },
-  [ResponseTypeEnum.CreateGame]: function (): string {
+  [ResponseTypeEnum.CreateGame]: () => {
     throw new Error('Function not implemented.');
   },
-  [ResponseTypeEnum.StartGame]: function (): string {
+  [ResponseTypeEnum.StartGame]: () => {
     throw new Error('Function not implemented.');
   },
-  [ResponseTypeEnum.Turn]: function (): string {
+  [ResponseTypeEnum.Turn]: () => {
     throw new Error('Function not implemented.');
   },
-  [ResponseTypeEnum.Attack]: function (): string {
+  [ResponseTypeEnum.Attack]: () => {
     throw new Error('Function not implemented.');
   },
-  [ResponseTypeEnum.Finish]: function (): string {
+  [ResponseTypeEnum.Finish]: () => {
     throw new Error('Function not implemented.');
   },
 };

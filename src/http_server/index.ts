@@ -26,12 +26,14 @@ wss.on('connection', (ws: WebSocket) => {
 
   ws.on('message', (message: string) => {
     const parsedMessage = parseMessage(message);
+    console.log(parsedMessage);
 
     const handler = handlers[parsedMessage.type];
     if (handler) {
       const req = handler(parsedMessage.data);
       console.log(req);
-      ws.send(req);
+      ws.send(req.user);
+      ws.send(req.winners);
     }
   });
 

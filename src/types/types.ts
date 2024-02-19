@@ -1,4 +1,4 @@
-import { ResponseTypeEnum } from './enums';
+import { RequestTypeEnum, ResponseTypeEnum } from './enums';
 
 export type UserType = {
   name: string;
@@ -15,7 +15,7 @@ export type InputType = {
 };
 
 export type WsResponse = ResponseUserType;
-export type WsRequest = RequestUserType;
+export type WsRequest = RequestUserType | RequestUpdateUsersType;
 
 export type RequestUserType = {
   type: 'reg';
@@ -25,5 +25,16 @@ export type RequestUserType = {
     error: boolean;
     errorText: string;
   };
+  id: 0;
+};
+
+export type WinnerType = {
+  name: string;
+  wins: number;
+};
+
+export type RequestUpdateUsersType = {
+  type: 'update_winners';
+  data: Array<WinnerType>;
   id: 0;
 };

@@ -1,5 +1,6 @@
-import { RequestUserType, ResponseUserType, UserType } from '../types';
-import { usersData } from '../data';
+import { RequestTypeEnum, RequestUpdateUsersType, RequestUserType, ResponseUserType, UserType } from '../types';
+import { usersData, winnersList } from '../data';
+import { stringifyMessage } from '../utils';
 
 export const addUser = (data: ResponseUserType) => {
   const newUser: UserType = {
@@ -9,8 +10,8 @@ export const addUser = (data: ResponseUserType) => {
 
   usersData.push(newUser);
 
-  const res: RequestUserType = {
-    type: 'reg',
+  const req: RequestUserType = {
+    type: RequestTypeEnum.Registration,
     data: {
       name: newUser.name,
       index: newUser.index,
@@ -20,5 +21,15 @@ export const addUser = (data: ResponseUserType) => {
     id: 0,
   };
 
-  return JSON.stringify({ ...res, data: JSON.stringify(res.data) });
+  return stringifyMessage(req);
+};
+
+export const updateWinners = () => {
+  const req: RequestUpdateUsersType = {
+    type: RequestTypeEnum.UpdateWinners,
+    data: winnersList,
+    id: 0,
+  };
+
+  return stringifyMessage(req);
 };

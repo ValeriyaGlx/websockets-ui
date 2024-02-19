@@ -6,3 +6,8 @@ export enum ResponseTypeEnum {
   Attack = 'attack',
   Finish = 'finish',
 }
+
+export enum RequestTypeEnum {
+  Registration = 'reg',
+  UpdateWinners = 'update_winners',
+}
