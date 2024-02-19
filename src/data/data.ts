@@ -1,7 +1,7 @@
-import { UserType, WinnerType } from '../types/';
+import { RoomType, UserType, WinnerType } from '../types/';
 
 export const usersData: UserType[] = [];
 
-export const availibaleRooms = [];
+export const availibleRooms: RoomType[] = [];
 
 export const winnersList: WinnerType[] = [];

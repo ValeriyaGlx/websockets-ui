@@ -4,6 +4,7 @@ import http from 'http';
 import WebSocket from 'ws';
 import { handlers } from '../handlers/handlers';
 import { parseMessage } from '../utils/parseMessage';
+import { BSWebSocket } from '../types';
 
 export const httpServer = http.createServer(function (req, res) {
   const __dirname = path.resolve(path.dirname(''));
@@ -21,7 +22,7 @@ export const httpServer = http.createServer(function (req, res) {
 
 const wss = new WebSocket.Server({ port: 3000 });
 
-wss.on('connection', (ws: WebSocket) => {
+wss.on('connection', (ws: BSWebSocket) => {
   console.log('New client connected');
 
   ws.on('message', (message: string) => {
@@ -30,10 +31,7 @@ wss.on('connection', (ws: WebSocket) => {
 
     const handler = handlers[parsedMessage.type];
     if (handler) {
-      const req = handler(parsedMessage.data);
-      console.log(req);
-      ws.send(req.user);
-      ws.send(req.winners);
+      handler(parsedMessage.data, ws);
     }
   });
 

@@ -1,22 +1,37 @@
-import { RequestTypeEnum, RequestUpdateUsersType, RequestUserType, ResponseUserType, UserType } from '../types';
+import {
+  BSWebSocket,
+  RequestTypeEnum,
+  RequestUpdateUsersType,
+  RequestUserType,
+  ResponseUserType,
+  UserType,
+} from '../types';
 import { usersData, winnersList } from '../data';
 import { stringifyMessage } from '../utils';
 
-export const addUser = (data: ResponseUserType) => {
+export const addUser = (data: ResponseUserType, ws: BSWebSocket) => {
   const newUser: UserType = {
     ...data,
     index: Date.now(),
   };
 
-  usersData.push(newUser);
+  const { index, name } = newUser;
+  const isUserNotExist = usersData.every((user) => user.name !== name);
+
+  if (isUserNotExist) {
+    usersData.push(newUser);
+
+    ws.index = index;
+    ws.name = name;
+  }
 
   const req: RequestUserType = {
     type: RequestTypeEnum.Registration,
     data: {
-      name: newUser.name,
-      index: newUser.index,
-      error: false,
-      errorText: '',
+      name: name,
+      index: index,
+      error: !isUserNotExist,
+      errorText: !isUserNotExist ? 'User with this name is already exist' : '',
     },
     id: 0,
   };

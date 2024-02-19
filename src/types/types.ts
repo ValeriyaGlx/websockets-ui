@@ -1,4 +1,10 @@
+import { WebSocket } from 'ws';
 import { RequestTypeEnum, ResponseTypeEnum } from './enums';
+
+export interface BSWebSocket extends WebSocket {
+  index: number;
+  name: string;
+}
 
 export type UserType = {
   name: string;
@@ -15,7 +21,7 @@ export type InputType = {
 };
 
 export type WsResponse = ResponseUserType;
-export type WsRequest = RequestUserType | RequestUpdateUsersType;
+export type WsRequest = RequestUserType | RequestUpdateUsersType | RequestUpdateRoomType;
 
 export type RequestUserType = {
   type: 'reg';
@@ -36,5 +42,19 @@ export type WinnerType = {
 export type RequestUpdateUsersType = {
   type: 'update_winners';
   data: Array<WinnerType>;
+  id: 0;
+};
+
+export type RoomType = {
+  roomId: number;
+  roomUsers: Array<{
+    name: string;
+    index: number;
+  }>;
+};
+
+export type RequestUpdateRoomType = {
+  type: 'update_room';
+  data: RoomType[];
   id: 0;
 };
