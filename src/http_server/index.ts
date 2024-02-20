@@ -36,6 +36,6 @@ wss.on('connection', (ws: BSWebSocket) => {
   });
 
   ws.on('close', () => {
-    console.log('Client disconnected');
+    console.log(`Client ${ws.name} disconnected`);
   });
 });

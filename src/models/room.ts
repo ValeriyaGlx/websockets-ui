@@ -33,6 +33,8 @@ export const updateRoomState = () => {
 export const addUserToRoom = (index: number, ws: BSWebSocket) => {
   const roomIndex = availibleRooms.findIndex((room) => room.roomId === index);
 
+  availibleRooms[roomIndex].roomUsers.push({ index: +ws.index, name: ws.name });
+
   const req: RequestCreateGame = {
     type: RequestTypeEnum.CreateGame,
     data: {
