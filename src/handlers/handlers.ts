@@ -1,7 +1,23 @@
 /* eslint-disable no-unused-vars */
 import { wss } from '../http_server';
-import { addUser, addUserToRoom, createRoom, removeFullRoom, updateRoomState, updateWinners } from '../models';
-import { BSWebSocket, ResponseAddToRoom, ResponseTypeEnum, ResponseUserType, WsRequest, WsResponse } from '../types';
+import {
+  addShips,
+  addUser,
+  addUserToRoom,
+  createRoom,
+  removeFullRoom,
+  updateRoomState,
+  updateWinners,
+} from '../models';
+import {
+  BSWebSocket,
+  ResponseAddShipsType,
+  ResponseAddToRoom,
+  ResponseTypeEnum,
+  ResponseUserType,
+  WsRequest,
+  WsResponse,
+} from '../types';
 
 export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => void> = {
   [ResponseTypeEnum.Registration]: (data: ResponseUserType, ws) => {
@@ -24,18 +40,12 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
     });
     removeFullRoom(data.indexRoom);
   },
-  [ResponseTypeEnum.AddShips]: (data, ws: BSWebSocket) => {
-    const gamersFields = [];
-    gamersFields.push(ws);
-    console.log(gamersFields);
-
-    // const ships = data.ships;
-    if (gamersFields.length === 2) {
-      console.log('start game');
-    }
-  },
-  [ResponseTypeEnum.StartGame]: () => {
-    console.log('');
+  [ResponseTypeEnum.AddShips]: (data: ResponseAddShipsType, ws: BSWebSocket) => {
+    // TODO: update room for each
+    //create it not for each only for players
+    wss.clients.forEach((client) => {
+      client.send(addShips(data, ws));
+    });
   },
   [ResponseTypeEnum.Turn]: () => {
     return;

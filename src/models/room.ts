@@ -1,5 +1,14 @@
 import { availibleRooms, currentGames } from '../data';
-import { BSWebSocket, CurrentGameType, RequestCreateGame, RequestTypeEnum, RequestUpdateRoomType, RoomType } from '../types';
+import {
+  BSWebSocket,
+  CurrentGameType,
+  RequestCreateGame,
+  RequestStartGame,
+  RequestTypeEnum,
+  RequestUpdateRoomType,
+  ResponseAddShipsType,
+  RoomType,
+} from '../types';
 import { stringifyMessage } from '../utils';
 
 export const createRoom = (ws: BSWebSocket) => {
@@ -43,4 +52,29 @@ export const removeFullRoom = (index: number) => {
     currentGames.push(currentGame);
     availibleRooms.splice(roomIndex, 1);
   }
+};
+
+export const addShips = (data: ResponseAddShipsType, ws: BSWebSocket) => {
+  const { gameId, ships, indexPlayer } = data;
+  const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
+  if (gameIndex !== -1) {
+    currentGames[gameIndex].users.push({
+      indexPlayer,
+      ships,
+    });
+  }
+  console.log(currentGames);
+
+  const currentShips = currentGames[gameIndex].users.filter((user) => user.indexPlayer !== +ws);
+  const req: RequestStartGame = {
+    type: RequestTypeEnum.StartGame,
+    data: {
+      // @ts-ignore
+      ships: currentShips,
+      currentPlayerIndex: +ws.index,
+    },
+    id: 0,
+  };
+
+  return stringifyMessage(req);
 };

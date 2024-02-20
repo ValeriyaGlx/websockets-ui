@@ -3,7 +3,7 @@ import { RequestTypeEnum, ResponseTypeEnum } from './enums';
 
 export type CurrentGameType = {
   gameId: number;
-  users: unknown[];
+  users: Array<{ indexPlayer: number; ships: ShipsPositionsType[] }>;
 };
 
 export interface BSWebSocket extends WebSocket {
@@ -30,11 +30,17 @@ export type InputType = {
 };
 
 export type WsResponse = ResponseUserType | ResponseAddToRoom | ResponseAddShipsType;
-export type WsRequest = RequestUserType | RequestUpdateUsersType | RequestUpdateRoomType | RequestCreateGame;
+export type WsRequest =
+  | RequestUserType
+  | RequestUpdateUsersType
+  | RequestUpdateRoomType
+  | RequestCreateGame
+  | RequestStartGame;
 
 export type ResponseAddShipsType = {
   gameId: number;
   ships: ShipsPositionsType[];
+  indexPlayer: number;
 };
 
 export type ShipsPositionsType = {
@@ -88,6 +94,15 @@ export type RequestCreateGame = {
   data: {
     idGame: number;
     idPlayer: number;
+  };
+  id: 0;
+};
+
+export type RequestStartGame = {
+  type: RequestTypeEnum.StartGame;
+  data: {
+    ships: ShipsPositionsType[];
+    currentPlayerIndex: number;
   };
   id: 0;
 };

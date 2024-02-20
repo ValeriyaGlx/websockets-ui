@@ -23,7 +23,7 @@ export const httpServer = http.createServer(function (req, res) {
 export const wss = new WebSocket.Server({ port: 3000 });
 
 wss.on('connection', (ws: BSWebSocket) => {
-  console.log('New client connected');
+  console.log(`New client ${ws.name} connected`);
 
   ws.on('message', (message: string) => {
     const parsedMessage = parseMessage(message);
