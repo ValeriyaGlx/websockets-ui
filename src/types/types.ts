@@ -14,14 +14,18 @@ export type UserType = {
 
 export type ResponseUserType = Omit<UserType, 'index'>;
 
+export type ResponseAddToRoom = {
+  indexRoom: number;
+};
+
 export type InputType = {
   type: ResponseTypeEnum;
   data: WsResponse;
   id: 0;
 };
 
-export type WsResponse = ResponseUserType;
-export type WsRequest = RequestUserType | RequestUpdateUsersType | RequestUpdateRoomType;
+export type WsResponse = ResponseUserType | ResponseAddToRoom;
+export type WsRequest = RequestUserType | RequestUpdateUsersType | RequestUpdateRoomType | RequestCreateGame;
 
 export type RequestUserType = {
   type: 'reg';
@@ -58,3 +62,13 @@ export type RequestUpdateRoomType = {
   data: RoomType[];
   id: 0;
 };
+
+export type RequestCreateGame = {
+  type: 'create_game';
+  data: {
+    idGame: number;
+    idPlayer: number;
+  };
+  id: 0;
+};
+// id for player in the game session, who have sent add_user_to_room request, not enemy

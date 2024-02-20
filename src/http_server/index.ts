@@ -20,7 +20,7 @@ export const httpServer = http.createServer(function (req, res) {
   });
 });
 
-const wss = new WebSocket.Server({ port: 3000 });
+export const wss = new WebSocket.Server({ port: 3000 });
 
 wss.on('connection', (ws: BSWebSocket) => {
   console.log('New client connected');

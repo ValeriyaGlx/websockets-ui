@@ -1,32 +1,35 @@
 /* eslint-disable no-unused-vars */
-import { addUser, updateRoomState, updateWinners } from '../models';
-import { BSWebSocket, ResponseTypeEnum, ResponseUserType, WsRequest, WsResponse } from '../types';
+import { wss } from '../http_server';
+import { addUser, addUserToRoom, createRoom, updateRoomState, updateWinners } from '../models';
+import { BSWebSocket, ResponseAddToRoom, ResponseTypeEnum, ResponseUserType, WsRequest, WsResponse } from '../types';
 
-export const handlers: Record<ResponseTypeEnum, (data: WsResponse, ws: BSWebSocket) => void> = {
-  [ResponseTypeEnum.Registration]: (data, ws) => {
+export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => void> = {
+  [ResponseTypeEnum.Registration]: (data: ResponseUserType, ws) => {
     ws.send(addUser(data, ws));
+    ws.send(updateRoomState());
     ws.send(updateWinners());
   },
 
   [ResponseTypeEnum.CreateRoom]: (_, ws) => {
-    ws.send(updateRoomState(ws));
+    createRoom(ws);
+    wss.clients.forEach(function each(client) {
+      client.send(updateRoomState());
+    });
   },
+  [ResponseTypeEnum.AddUserToRoom]: function (data: ResponseAddToRoom, ws): void {
+    ws.send(addUserToRoom(data.indexRoom, ws));
+  },
+
   [ResponseTypeEnum.StartGame]: () => {
-    throw new Error('Function not implemented.');
+    return;
   },
   [ResponseTypeEnum.Turn]: () => {
-    throw new Error('Function not implemented.');
+    return;
   },
   [ResponseTypeEnum.Attack]: () => {
-    throw new Error('Function not implemented.');
+    return;
   },
   [ResponseTypeEnum.Finish]: () => {
-    throw new Error('Function not implemented.');
-  },
-  [ResponseTypeEnum.AddUserToRoom]: function (data, ws): void {
-    throw new Error('Function not implemented.');
-  },
-  [ResponseTypeEnum.CreateGame]: function (data: ResponseUserType, ws: BSWebSocket): void {
-    throw new Error('Function not implemented.');
+    return;
   },
 };

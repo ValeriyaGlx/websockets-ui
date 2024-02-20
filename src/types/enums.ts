@@ -1,7 +1,6 @@
 export enum ResponseTypeEnum {
   Registration = 'reg',
   CreateRoom = 'create_room',
-  CreateGame = 'create_game',
   AddUserToRoom = 'add_user_to_room',
   StartGame = 'start_game',
   Turn = 'turn',
