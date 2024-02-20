@@ -1,5 +1,5 @@
-import { availibleRooms } from '../data';
-import { BSWebSocket, RequestCreateGame, RequestTypeEnum, RequestUpdateRoomType, RoomType } from '../types';
+import { availibleRooms, currentGames } from '../data';
+import { BSWebSocket, CurrentGameType, RequestCreateGame, RequestTypeEnum, RequestUpdateRoomType, RoomType } from '../types';
 import { stringifyMessage } from '../utils';
 
 export const createRoom = (ws: BSWebSocket) => {
@@ -22,20 +22,25 @@ export const updateRoomState = () => {
 };
 
 export const addUserToRoom = (index: number, ws: BSWebSocket) => {
-  const room = availibleRooms.findIndex((room) => room.roomId === index);
-  if (index !== -1) {
-    availibleRooms.splice(room, 1);
-  }
+  const roomIndex = availibleRooms.findIndex((room) => room.roomId === index);
 
-  console.log(room);
   const req: RequestCreateGame = {
     type: RequestTypeEnum.CreateGame,
     data: {
-      idGame: Date.now(),
+      idGame: availibleRooms[roomIndex].roomId,
       idPlayer: +ws.index,
     },
     id: 0,
   };
 
   return stringifyMessage(req);
+};
+
+export const removeFullRoom = (index: number) => {
+  const roomIndex = availibleRooms.findIndex((room) => room.roomId === index);
+  if (index !== -1) {
+    const currentGame: CurrentGameType = { gameId: index, users: [] };
+    currentGames.push(currentGame);
+    availibleRooms.splice(roomIndex, 1);
+  }
 };

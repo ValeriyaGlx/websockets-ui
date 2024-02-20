@@ -7,5 +7,11 @@ export const parseMessage = (message: string): InputType => {
   } catch (error) {
     console.error('Parsed Error', error);
   }
-  return { ...parsedMessage, data: parsedMessage.data ? JSON.parse(parsedMessage.data) : '' };
+
+  const req = {
+    ...parsedMessage,
+    data: parsedMessage.data ? JSON.parse(parsedMessage.data) : '',
+  };
+
+  return req;
 };

@@ -1,6 +1,11 @@
 import { WebSocket } from 'ws';
 import { RequestTypeEnum, ResponseTypeEnum } from './enums';
 
+export type CurrentGameType = {
+  gameId: number;
+  users: unknown[];
+};
+
 export interface BSWebSocket extends WebSocket {
   index: number;
   name: string;
@@ -24,8 +29,23 @@ export type InputType = {
   id: 0;
 };
 
-export type WsResponse = ResponseUserType | ResponseAddToRoom;
+export type WsResponse = ResponseUserType | ResponseAddToRoom | ResponseAddShipsType;
 export type WsRequest = RequestUserType | RequestUpdateUsersType | RequestUpdateRoomType | RequestCreateGame;
+
+export type ResponseAddShipsType = {
+  gameId: number;
+  ships: ShipsPositionsType[];
+};
+
+export type ShipsPositionsType = {
+  position: {
+    x: number;
+    y: number;
+  };
+  direction: boolean;
+  length: number;
+  type: 'small' | 'medium' | 'large' | 'huge';
+};
 
 export type RequestUserType = {
   type: 'reg';
@@ -71,4 +91,3 @@ export type RequestCreateGame = {
   };
   id: 0;
 };
-// id for player in the game session, who have sent add_user_to_room request, not enemy
