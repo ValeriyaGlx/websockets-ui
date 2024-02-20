@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { availibleRooms } from '../data';
+import { availibleRooms, currentGames } from '../data';
 import { wss } from '../http_server';
 import {
   addShips,
@@ -7,6 +7,7 @@ import {
   addUserToRoom,
   createRoom,
   removeFullRoom,
+  switchTurn,
   updateRoomState,
   updateWinners,
 } from '../models';
@@ -26,7 +27,6 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
     });
   },
   [ResponseTypeEnum.AddUserToRoom]: (data: ResponseAddToRoom, ws) => {
-    // TODO: take a look why there are 3 response (should be 2);
     const roomIndex = availibleRooms.findIndex((room) => room.roomId === data.indexRoom);
     wss.clients.forEach((client) => {
       const foundUser = availibleRooms[roomIndex].roomUsers.find(
@@ -43,14 +43,24 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
     });
   },
   [ResponseTypeEnum.AddShips]: (data: ResponseAddShipsType, ws: BSWebSocket) => {
-    // TODO: update room for each
-    //create it not for each only for players
-    wss.clients.forEach((client) => {
-      client.send(addShips(data, ws));
-    });
-  },
-  [ResponseTypeEnum.Turn]: () => {
-    return;
+    // TODO: work but New client undefined connected
+    const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
+
+    const gameData = addShips(data, ws);
+    if (currentGames[gameIndex].users.length === 2) {
+      wss.clients.forEach((client) => {
+        const foundUser = currentGames[gameIndex].users.find(
+          (user) => (client as BSWebSocket).index === user.indexPlayer,
+        );
+        if (foundUser) {
+          client.send(gameData);
+          ws.send(gameData);
+
+          client.send(switchTurn(currentGames[gameIndex]));
+          ws.send(switchTurn(currentGames[gameIndex]));
+        }
+      });
+    }
   },
   [ResponseTypeEnum.Attack]: () => {
     return;

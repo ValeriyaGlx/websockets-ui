@@ -59,18 +59,19 @@ export const removeFullRoom = (index: number) => {
 export const addShips = (data: ResponseAddShipsType, ws: BSWebSocket) => {
   const { gameId, ships, indexPlayer } = data;
   const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
-  if (gameIndex !== -1) {
+
+  if (gameIndex !== -1 && currentGames[gameIndex].users.length < 2) {
     currentGames[gameIndex].users.push({
       indexPlayer,
       ships,
     });
   }
-  console.log(currentGames);
 
-  const currentShips = currentGames[gameIndex].users.filter((user) => user.indexPlayer !== +ws);
+  const currentShips = currentGames[gameIndex].users.find((user) => user.indexPlayer === +ws);
   const req: RequestStartGame = {
     type: RequestTypeEnum.StartGame,
     data: {
+      // TODO remove it
       // @ts-ignore
       ships: currentShips,
       currentPlayerIndex: +ws.index,

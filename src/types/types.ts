@@ -35,7 +35,8 @@ export type WsRequest =
   | RequestUpdateUsersType
   | RequestUpdateRoomType
   | RequestCreateGame
-  | RequestStartGame;
+  | RequestStartGame
+  | RequestTurn;
 
 export type ResponseAddShipsType = {
   gameId: number;
@@ -103,6 +104,14 @@ export type RequestStartGame = {
   data: {
     ships: ShipsPositionsType[];
     currentPlayerIndex: number;
+  };
+  id: 0;
+};
+
+export type RequestTurn = {
+  type: RequestTypeEnum.Turn;
+  data: {
+    currentPlayer: number;
   };
   id: 0;
 };
