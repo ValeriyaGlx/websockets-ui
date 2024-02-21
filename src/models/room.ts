@@ -10,6 +10,7 @@ import {
   RoomType,
 } from '../types';
 import { stringifyMessage } from '../utils';
+import { GameBoard, Ship } from '../utils/createShipsMap';
 
 export const createRoom = (ws: BSWebSocket) => {
   const newRoom: RoomType = {
@@ -60,10 +61,17 @@ export const addShips = (data: ResponseAddShipsType, ws: BSWebSocket) => {
   const { gameId, ships, indexPlayer } = data;
   const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
 
+  const gameBoard = new GameBoard(10, 10);
+
+  for (const ship of ships) {
+    const newShip = new Ship(ship);
+    gameBoard.placeShip(newShip);
+  }
+
   if (gameIndex !== -1 && currentGames[gameIndex].users.length < 2) {
     currentGames[gameIndex].users.push({
       indexPlayer,
-      ships,
+      board: gameBoard,
     });
   }
 

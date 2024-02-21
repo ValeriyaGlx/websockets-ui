@@ -46,7 +46,10 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
 
     const gameData = addShips(data, ws);
+    console.log(currentGames[gameIndex].users[0].board);
+
     if (currentGames[gameIndex].users.length === 2) {
+      // Cannot read properties of undefined (reading 'forEach')
       wss.clients.forEach((client) => {
         const foundUser = currentGames[gameIndex].users.find(
           (user) => (client as BSWebSocket).index === user.indexPlayer,

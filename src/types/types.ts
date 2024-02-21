@@ -1,9 +1,10 @@
 import { WebSocket } from 'ws';
-import { RequestTypeEnum, ResponseTypeEnum } from './enums';
+import { AttackStatusEnum, RequestTypeEnum, ResponseTypeEnum, ShipTypeEnum } from './enums';
+import { GameBoard } from '../utils/createShipsMap';
 
 export type CurrentGameType = {
   gameId: number;
-  users: Array<{ indexPlayer: number; ships: ShipsPositionsType[] }>;
+  users: Array<{ indexPlayer: number; board: GameBoard }>;
 };
 
 export interface BSWebSocket extends WebSocket {
@@ -29,14 +30,39 @@ export type InputType = {
   id: 0;
 };
 
-export type WsResponse = ResponseUserType | ResponseAddToRoom | ResponseAddShipsType;
+export type ResponseAttackType = {
+  type: ResponseTypeEnum.Attack;
+  data: {
+    gameId: number;
+    x: number;
+    y: number;
+    indexPlayer: number /* id of the player in the current game session */;
+  };
+  id: 0;
+};
+
+export type RequestAttackType = {
+  type: RequestTypeEnum.Attack;
+  data: {
+    position: {
+      x: number;
+      y: number;
+    };
+    currentPlayer: number /* id of the player in the current game session */;
+    status: AttackStatusEnum;
+  };
+  id: 0;
+};
+
+export type WsResponse = ResponseUserType | ResponseAddToRoom | ResponseAddShipsType | ResponseAttackType;
 export type WsRequest =
   | RequestUserType
   | RequestUpdateUsersType
   | RequestUpdateRoomType
   | RequestCreateGame
   | RequestStartGame
-  | RequestTurn;
+  | RequestTurn
+  | RequestAttackType;
 
 export type ResponseAddShipsType = {
   gameId: number;
@@ -51,7 +77,7 @@ export type ShipsPositionsType = {
   };
   direction: boolean;
   length: number;
-  type: 'small' | 'medium' | 'large' | 'huge';
+  type: ShipTypeEnum;
 };
 
 export type RequestUserType = {

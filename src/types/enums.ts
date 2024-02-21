@@ -14,10 +14,18 @@ export enum RequestTypeEnum {
   CreateGame = 'create_game',
   StartGame = 'start_game',
   Turn = 'turn',
+  Attack = 'attack',
 }
 
 export enum AttackStatusEnum {
   Miss = 'miss',
   Killed = 'killed',
   Shot = 'shot',
+}
+
+export enum ShipTypeEnum {
+  Small = 'small',
+  Medium = 'medium',
+  Large = 'large',
+  Huge = 'huge',
 }
