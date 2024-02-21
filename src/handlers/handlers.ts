@@ -43,7 +43,6 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
     });
   },
   [ResponseTypeEnum.AddShips]: (data: ResponseAddShipsType, ws: BSWebSocket) => {
-    // TODO: work but New client undefined connected
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
 
     const gameData = addShips(data, ws);
@@ -54,10 +53,7 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
         );
         if (foundUser) {
           client.send(gameData);
-          ws.send(gameData);
-
           client.send(switchTurn(currentGames[gameIndex]));
-          ws.send(switchTurn(currentGames[gameIndex]));
         }
       });
     }
