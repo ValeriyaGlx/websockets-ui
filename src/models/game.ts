@@ -52,24 +52,43 @@ export const getAttack = (data: AttackType) => {
   const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
   const opponentUser = currentGames[gameIndex].users.find((user) => user.indexPlayer !== indexPlayer);
   const attack = opponentUser?.board.attack({ x, y });
-  console.log(attack);
 
-  const req: RequestAttackType = {
-    type: RequestTypeEnum.Attack,
-    data: {
-      position: {
-        x,
-        y,
+  const turn = switchTurn(currentGames[gameIndex], attack?.hit);
+
+  let request: RequestAttackType;
+
+  if (attack?.cells.length === 0) {
+    request = {
+      type: RequestTypeEnum.Attack,
+      data: {
+        position: {
+          x,
+          y,
+        },
+        currentPlayer: indexPlayer,
+        status: attack?.hit,
       },
-      currentPlayer: indexPlayer,
-      // TODO: remove it
-      //@ts-ignore
-      status: attack?.hit,
-    },
-    id: 0,
-  };
+      id: 0,
+    };
 
-  const hit = switchTurn(currentGames[gameIndex], attack?.hit);
-
-  return { req: stringifyMessage(req), hit };
+    return { req: stringifyMessage(request), turn };
+  } else {
+    const reqArray: string[] = [];
+    attack?.cells.forEach((cell) => {
+      request = {
+        type: RequestTypeEnum.Attack,
+        data: {
+          position: {
+            x: cell.x,
+            y: cell.y,
+          },
+          currentPlayer: indexPlayer,
+          status: attack?.hit,
+        },
+        id: 0,
+      };
+      reqArray.push(stringifyMessage(request));
+    });
+    return { req: reqArray, turn };
+  }
 };

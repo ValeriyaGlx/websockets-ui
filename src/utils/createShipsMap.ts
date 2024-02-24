@@ -1,7 +1,5 @@
 import { AttackStatusEnum, ShipTypeEnum, ShipsPositionsType } from '../types';
 
-// direction: false === horisontal;
-
 type Cell = {
   x: number;
   y: number;
@@ -18,8 +16,8 @@ export class Ship {
   constructor(ship: ShipsPositionsType) {
     const { position, direction, type, length } = ship;
     this.position = position;
-    this.direction = direction; //(true - вертикально, false - горизонтально)
-    this.type = type; // huge, large, medium, small
+    this.direction = direction;
+    this.type = type;
     this.length = length;
     this.shots = new Array(length).fill(false);
     this.cells = [];
@@ -37,7 +35,8 @@ export class Ship {
   }
 
   isKilled() {
-    return this.shots.every((cell) => cell); // возвращает true, если все точки корабля поражены
+    const allCellsKilled = this.shots.every((cell) => cell);
+    return { allCellsKilled, cells: this.cells }; // возвращает true, если все точки корабля поражены
   }
 
   shot(cell: Cell) {
@@ -66,15 +65,18 @@ export class GameBoard {
     this.ships.push(ship);
   }
 
-  attack(point: Cell): { hit: AttackStatusEnum; shipType?: string } {
+  attack(point: Cell): { hit: AttackStatusEnum; cells: Cell[] | [] } {
     for (const ship of this.ships) {
       for (const cell of ship.cells) {
         if (cell.x === point.x && cell.y === point.y) {
           ship.shot(point);
-          return { hit: ship.isKilled() ? AttackStatusEnum.Killed : AttackStatusEnum.Shot };
+          return {
+            hit: ship.isKilled().allCellsKilled ? AttackStatusEnum.Killed : AttackStatusEnum.Shot,
+            cells: ship.isKilled().allCellsKilled ? ship.isKilled().cells : [],
+          };
         }
       }
     }
-    return { hit: AttackStatusEnum.Miss };
+    return { hit: AttackStatusEnum.Miss, cells: [] };
   }
 }

@@ -78,9 +78,13 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
         (user) => (client as BSWebSocket).index === user.indexPlayer,
       );
       if (foundUser) {
-        const { req, hit } = attack;
-        client.send(req);
-        client.send(hit);
+        const { req, turn } = attack;
+        if (Array.isArray(req)) {
+          req.forEach((cell) => client.send(cell));
+        } else {
+          client.send(req);
+        }
+        client.send(turn);
       }
     });
   },
