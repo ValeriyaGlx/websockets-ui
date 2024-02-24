@@ -3,6 +3,7 @@ import {
   AttackStatusEnum,
   AttackType,
   CurrentGameType,
+  RandomAttackType,
   RequestAttackType,
   RequestTurn,
   RequestTypeEnum,
@@ -45,6 +46,11 @@ export const switchTurn = (game: CurrentGameType, command?: AttackStatusEnum) =>
     id: 0,
   };
   return stringifyMessage(req);
+};
+
+export const checkTurn = (game: CurrentGameType) => {
+  const { users } = game;
+  return users[index].indexPlayer;
 };
 
 export const getAttack = (data: AttackType) => {
@@ -108,4 +114,25 @@ export const getAttack = (data: AttackType) => {
     });
     return { req: reqArray, turn };
   }
+};
+
+export const getRandomAttack = (data: RandomAttackType) => {
+  const { indexPlayer, gameId } = data;
+
+  const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
+  const opponentUser = currentGames[gameIndex].users.find((user) => user.indexPlayer !== indexPlayer);
+  // TODO: remove it
+  // @ts-ignore
+  const randomCell = opponentUser.board.randomAttack();
+
+  const { x, y } = randomCell;
+
+  const newAttackData: AttackType = {
+    indexPlayer: indexPlayer,
+    gameId,
+    x,
+    y,
+  };
+
+  return getAttack(newAttackData);
 };

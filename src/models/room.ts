@@ -61,7 +61,7 @@ export const addShips = (data: ResponseAddShipsType, ws: BSWebSocket) => {
   const { gameId, ships, indexPlayer } = data;
   const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
 
-  const gameBoard = new GameBoard(10, 10);
+  const gameBoard = new GameBoard();
 
   for (const ship of ships) {
     const newShip = new Ship(ship);

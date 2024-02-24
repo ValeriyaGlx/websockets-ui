@@ -1,4 +1,5 @@
 import { AttackStatusEnum, ShipTypeEnum, ShipsPositionsType } from '../types';
+import { BOARD_WIDTH } from './constants';
 
 type Cell = {
   x: number;
@@ -46,7 +47,13 @@ export class Ship {
         for (let dy = -1; dy <= 1; dy++) {
           const x = cell.x + dx;
           const y = cell.y + dy;
-          if (x >= 0 && x < 10 && y >= 0 && y < 10 && !this.cells.some((cell) => cell.x === x && cell.y === y)) {
+          if (
+            x >= 0 &&
+            x < BOARD_WIDTH &&
+            y >= 0 &&
+            y < BOARD_WIDTH &&
+            !this.cells.some((cell) => cell.x === x && cell.y === y)
+          ) {
             const aroundCell: Cell = { x, y };
             aroundCells.push(aroundCell);
           }
@@ -71,31 +78,51 @@ export class GameBoard {
   width: number;
   height: number;
   ships: Ship[];
+  usedCells: Cell[];
 
-  constructor(width: number, height: number) {
-    this.width = width;
-    this.height = height;
+  constructor() {
+    this.width = BOARD_WIDTH;
+    this.height = BOARD_WIDTH;
     this.ships = [];
+    this.usedCells = [];
   }
 
   placeShip(ship: Ship): void {
     this.ships.push(ship);
   }
 
-  attack(point: Cell): { hit: AttackStatusEnum; cells: Cell[] | []; aroundCells: Cell[] | [] } {
+  attack(point: Cell): { hit: AttackStatusEnum; cells: Cell[] | []; aroundCells: Cell[] | [] } | undefined {
     for (const ship of this.ships) {
       for (const cell of ship.cells) {
         if (cell.x === point.x && cell.y === point.y) {
           ship.shot(point);
           const isKilled = ship.isKilled();
+          isKilled.allCellsKilled
+            ? this.usedCells.push(...isKilled.cells, ...ship.findCellsAround())
+            : this.usedCells.push(point);
           return {
             hit: isKilled.allCellsKilled ? AttackStatusEnum.Killed : AttackStatusEnum.Shot,
-            cells: isKilled.allCellsKilled ? ship.isKilled().cells : [],
+            cells: isKilled.allCellsKilled ? isKilled.cells : [],
             aroundCells: isKilled.allCellsKilled ? ship.findCellsAround() : [],
           };
         }
       }
     }
     return { hit: AttackStatusEnum.Miss, cells: [], aroundCells: [] };
+  }
+
+  randomAttack(): Cell {
+    const availableCells: Cell[] = [];
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        const cell: Cell = { x, y };
+        if (!this.usedCells.some((usedCell) => usedCell.x === x && usedCell.y === y)) {
+          availableCells.push(cell);
+        }
+      }
+    }
+    const randomIndex = Math.floor(Math.random() * availableCells.length);
+    this.usedCells.push(availableCells[randomIndex]);
+    return availableCells[randomIndex];
   }
 }

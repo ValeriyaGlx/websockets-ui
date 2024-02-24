@@ -34,9 +34,10 @@ export type AttackType = {
   gameId: number;
   x: number;
   y: number;
-  /* id of the player in the current game session */
   indexPlayer: number;
 };
+
+export type RandomAttackType = Omit<AttackType, 'x' | 'y'>;
 
 export type ResponseAttackType = {
   type: ResponseTypeEnum.Attack;

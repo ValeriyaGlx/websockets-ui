@@ -5,8 +5,10 @@ import {
   addShips,
   addUser,
   addUserToRoom,
+  checkTurn,
   createRoom,
   getAttack,
+  getRandomAttack,
   removeFullRoom,
   switchTurn,
   updateRoomState,
@@ -15,9 +17,9 @@ import {
 import {
   AttackType,
   BSWebSocket,
+  RandomAttackType,
   ResponseAddShipsType,
   ResponseAddToRoom,
-  ResponseAttackType,
   ResponseTypeEnum,
   ResponseUserType,
 } from '../types';
@@ -77,6 +79,11 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       const foundUser = currentGames[gameIndex].users.find(
         (user) => (client as BSWebSocket).index === user.indexPlayer,
       );
+
+      // TODO: запретить ходить не в свой ход
+      // console.log(foundUser?.indexPlayer);
+      // console.log(checkTurn(currentGames[gameIndex]));
+
       if (foundUser) {
         const { req, turn } = attack;
         if (Array.isArray(req)) {
@@ -88,7 +95,28 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       }
     });
   },
-  [ResponseTypeEnum.RandomAttack]: () => {
-    return;
+  [ResponseTypeEnum.RandomAttack]: (data: RandomAttackType) => {
+    const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
+    const attack = getRandomAttack(data);
+
+    wss.clients.forEach((client) => {
+      const foundUser = currentGames[gameIndex].users.find(
+        (user) => (client as BSWebSocket).index === user.indexPlayer,
+      );
+
+      // TODO: запретить ходить не в свой ход
+      // console.log(foundUser?.indexPlayer);
+      // console.log(checkTurn(currentGames[gameIndex]));
+
+      if (foundUser) {
+        const { req, turn } = attack;
+        if (Array.isArray(req)) {
+          req.forEach((cell) => client.send(cell));
+        } else {
+          client.send(req);
+        }
+        client.send(turn);
+      }
+    });
   },
 };
