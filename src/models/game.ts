@@ -75,15 +75,32 @@ export const getAttack = (data: AttackType) => {
   } else {
     const reqArray: string[] = [];
     attack?.cells.forEach((cell) => {
+      const { x, y } = cell;
       request = {
         type: RequestTypeEnum.Attack,
         data: {
           position: {
-            x: cell.x,
-            y: cell.y,
+            x,
+            y,
           },
           currentPlayer: indexPlayer,
           status: attack?.hit,
+        },
+        id: 0,
+      };
+      reqArray.push(stringifyMessage(request));
+    });
+    attack?.aroundCells.forEach((cell) => {
+      const { x, y } = cell;
+      request = {
+        type: RequestTypeEnum.Attack,
+        data: {
+          position: {
+            x,
+            y,
+          },
+          currentPlayer: indexPlayer,
+          status: AttackStatusEnum.Miss,
         },
         id: 0,
       };

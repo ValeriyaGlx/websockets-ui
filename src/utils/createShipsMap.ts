@@ -36,7 +36,24 @@ export class Ship {
 
   isKilled() {
     const allCellsKilled = this.shots.every((cell) => cell);
-    return { allCellsKilled, cells: this.cells }; // возвращает true, если все точки корабля поражены
+    return { allCellsKilled, cells: this.cells };
+  }
+
+  findCellsAround() {
+    const aroundCells: Cell[] = [];
+    for (const cell of this.cells) {
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          const x = cell.x + dx;
+          const y = cell.y + dy;
+          if (x >= 0 && x < 10 && y >= 0 && y < 10 && !this.cells.some((cell) => cell.x === x && cell.y === y)) {
+            const aroundCell: Cell = { x, y };
+            aroundCells.push(aroundCell);
+          }
+        }
+      }
+    }
+    return aroundCells;
   }
 
   shot(cell: Cell) {
@@ -65,18 +82,20 @@ export class GameBoard {
     this.ships.push(ship);
   }
 
-  attack(point: Cell): { hit: AttackStatusEnum; cells: Cell[] | [] } {
+  attack(point: Cell): { hit: AttackStatusEnum; cells: Cell[] | []; aroundCells: Cell[] | [] } {
     for (const ship of this.ships) {
       for (const cell of ship.cells) {
         if (cell.x === point.x && cell.y === point.y) {
           ship.shot(point);
+          const isKilled = ship.isKilled();
           return {
-            hit: ship.isKilled().allCellsKilled ? AttackStatusEnum.Killed : AttackStatusEnum.Shot,
-            cells: ship.isKilled().allCellsKilled ? ship.isKilled().cells : [],
+            hit: isKilled.allCellsKilled ? AttackStatusEnum.Killed : AttackStatusEnum.Shot,
+            cells: isKilled.allCellsKilled ? ship.isKilled().cells : [],
+            aroundCells: isKilled.allCellsKilled ? ship.findCellsAround() : [],
           };
         }
       }
     }
-    return { hit: AttackStatusEnum.Miss, cells: [] };
+    return { hit: AttackStatusEnum.Miss, cells: [], aroundCells: [] };
   }
 }
