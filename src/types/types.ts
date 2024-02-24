@@ -66,7 +66,8 @@ export type WsRequest =
   | RequestCreateGame
   | RequestStartGame
   | RequestTurn
-  | RequestAttackType;
+  | RequestAttackType
+  | RequestFinishType;
 
 export type ResponseAddShipsType = {
   gameId: number;
@@ -142,6 +143,14 @@ export type RequestTurn = {
   type: RequestTypeEnum.Turn;
   data: {
     currentPlayer: number;
+  };
+  id: 0;
+};
+
+export type RequestFinishType = {
+  type: RequestTypeEnum.Finish;
+  data: {
+    winPlayer: number | string;
   };
   id: 0;
 };

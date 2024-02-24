@@ -13,6 +13,12 @@ import { stringifyMessage } from '../utils';
 import { GameBoard, Ship } from '../utils/createShipsMap';
 
 export const createRoom = (ws: BSWebSocket) => {
+  const isRoomExist = availibleRooms.find((room) => {
+    return room.roomUsers[0].index === ws.index;
+  });
+
+  if (isRoomExist) return;
+
   const newRoom: RoomType = {
     roomId: Date.now(),
     roomUsers: [{ index: +ws.index, name: ws.name }],

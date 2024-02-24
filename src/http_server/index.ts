@@ -23,11 +23,10 @@ export const httpServer = http.createServer(function (req, res) {
 export const wss = new WebSocket.Server({ port: 3000 });
 
 wss.on('connection', (ws: BSWebSocket) => {
-  console.log(`New client ${ws.name} connected`);
+  console.log('New client connected');
 
   ws.on('message', (message: string) => {
     const parsedMessage = parseMessage(message);
-    console.log(parsedMessage);
 
     const handler = handlers[parsedMessage.type];
     if (handler) {
@@ -36,6 +35,6 @@ wss.on('connection', (ws: BSWebSocket) => {
   });
 
   ws.on('close', () => {
-    console.log(`Client ${ws.name} disconnected`);
+    console.log('Client disconnected');
   });
 });

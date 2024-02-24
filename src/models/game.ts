@@ -2,13 +2,17 @@ import { currentGames } from '../data';
 import {
   AttackStatusEnum,
   AttackType,
+  BSWebSocket,
   CurrentGameType,
   RandomAttackType,
   RequestAttackType,
+  RequestFinishType,
   RequestTurn,
   RequestTypeEnum,
 } from '../types';
 import { stringifyMessage } from '../utils';
+
+import { wss } from '../http_server';
 
 let index: number = 0;
 
@@ -53,11 +57,35 @@ export const checkTurn = (game: CurrentGameType) => {
   return users[index].indexPlayer;
 };
 
+const recountWinners = (index: number) => {
+  const winnerName = [...wss.clients].find((client) => {
+    (client as BSWebSocket).index === index;
+  });
+
+  console.log(winnerName);
+};
+
 export const getAttack = (data: AttackType) => {
   const { x, y, gameId, indexPlayer } = data;
   const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
   const opponentUser = currentGames[gameIndex].users.find((user) => user.indexPlayer !== indexPlayer);
   const attack = opponentUser?.board.attack({ x, y });
+  const isFinish = opponentUser?.board.isShipsEnds();
+
+  if (isFinish) {
+    // better to add last shot
+    // here update winners winnersList
+    recountWinners(indexPlayer);
+    const req: RequestFinishType = {
+      type: RequestTypeEnum.Finish,
+      data: {
+        winPlayer: indexPlayer,
+      },
+      id: 0,
+    };
+
+    return { req: stringifyMessage(req) };
+  }
 
   const turn = switchTurn(currentGames[gameIndex], attack?.hit);
 

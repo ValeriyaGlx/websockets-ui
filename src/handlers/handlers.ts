@@ -71,7 +71,7 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       });
     }
   },
-  [ResponseTypeEnum.Attack]: (data: AttackType) => {
+  [ResponseTypeEnum.Attack]: (data: AttackType, ws: BSWebSocket) => {
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
     const attack = getAttack(data);
 
@@ -84,18 +84,26 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       // console.log(foundUser?.indexPlayer);
       // console.log(checkTurn(currentGames[gameIndex]));
 
+      // поифксить этот ужас
+
       if (foundUser) {
         const { req, turn } = attack;
-        if (Array.isArray(req)) {
-          req.forEach((cell) => client.send(cell));
+
+        if (turn) {
+          if (Array.isArray(req)) {
+            req.forEach((cell) => client.send(cell));
+          } else {
+            client.send(req);
+          }
+          client.send(turn);
         } else {
           client.send(req);
+          ws.send(updateWinners());
         }
-        client.send(turn);
       }
     });
   },
-  [ResponseTypeEnum.RandomAttack]: (data: RandomAttackType) => {
+  [ResponseTypeEnum.RandomAttack]: (data: RandomAttackType, ws: BSWebSocket) => {
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
     const attack = getRandomAttack(data);
 
@@ -110,12 +118,17 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
 
       if (foundUser) {
         const { req, turn } = attack;
-        if (Array.isArray(req)) {
-          req.forEach((cell) => client.send(cell));
+        if (turn) {
+          if (Array.isArray(req)) {
+            req.forEach((cell) => client.send(cell));
+          } else {
+            client.send(req);
+          }
+          client.send(turn);
         } else {
           client.send(req);
+          ws.send(updateWinners());
         }
-        client.send(turn);
       }
     });
   },

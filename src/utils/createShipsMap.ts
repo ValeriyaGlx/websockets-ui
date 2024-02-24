@@ -77,6 +77,7 @@ export class Ship {
 export class GameBoard {
   width: number;
   height: number;
+  livedShips: Ship[];
   ships: Ship[];
   usedCells: Cell[];
 
@@ -85,9 +86,11 @@ export class GameBoard {
     this.height = BOARD_WIDTH;
     this.ships = [];
     this.usedCells = [];
+    this.livedShips = [];
   }
 
   placeShip(ship: Ship): void {
+    this.livedShips.push(ship);
     this.ships.push(ship);
   }
 
@@ -97,9 +100,15 @@ export class GameBoard {
         if (cell.x === point.x && cell.y === point.y) {
           ship.shot(point);
           const isKilled = ship.isKilled();
-          isKilled.allCellsKilled
-            ? this.usedCells.push(...isKilled.cells, ...ship.findCellsAround())
-            : this.usedCells.push(point);
+          if (isKilled.allCellsKilled) {
+            this.usedCells.push(...isKilled.cells, ...ship.findCellsAround());
+            const index = this.livedShips.indexOf(ship);
+            if (index !== -1) {
+              this.livedShips.splice(index, 1);
+            }
+          } else {
+            this.usedCells.push(point);
+          }
           return {
             hit: isKilled.allCellsKilled ? AttackStatusEnum.Killed : AttackStatusEnum.Shot,
             cells: isKilled.allCellsKilled ? isKilled.cells : [],
@@ -124,5 +133,9 @@ export class GameBoard {
     const randomIndex = Math.floor(Math.random() * availableCells.length);
     this.usedCells.push(availableCells[randomIndex]);
     return availableCells[randomIndex];
+  }
+
+  isShipsEnds() {
+    return this.livedShips.length === 0;
   }
 }
