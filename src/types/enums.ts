@@ -4,7 +4,7 @@ export enum ResponseTypeEnum {
   AddUserToRoom = 'add_user_to_room',
   AddShips = 'add_ships',
   Attack = 'attack',
-  Finish = 'finish',
+  RandomAttack = 'randomAttack',
 }
 
 export enum RequestTypeEnum {
@@ -15,6 +15,7 @@ export enum RequestTypeEnum {
   StartGame = 'start_game',
   Turn = 'turn',
   Attack = 'attack',
+  Finish = 'finish',
 }
 
 export enum AttackStatusEnum {

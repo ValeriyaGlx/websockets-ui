@@ -30,14 +30,17 @@ export type InputType = {
   id: 0;
 };
 
+export type AttackType = {
+  gameId: number;
+  x: number;
+  y: number;
+  /* id of the player in the current game session */
+  indexPlayer: number;
+};
+
 export type ResponseAttackType = {
   type: ResponseTypeEnum.Attack;
-  data: {
-    gameId: number;
-    x: number;
-    y: number;
-    indexPlayer: number /* id of the player in the current game session */;
-  };
+  data: AttackType;
   id: 0;
 };
 

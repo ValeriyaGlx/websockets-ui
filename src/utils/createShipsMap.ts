@@ -1,4 +1,4 @@
-import { ShipTypeEnum, ShipsPositionsType } from '../types';
+import { AttackStatusEnum, ShipTypeEnum, ShipsPositionsType } from '../types';
 
 // direction: false === horisontal;
 
@@ -66,15 +66,15 @@ export class GameBoard {
     this.ships.push(ship);
   }
 
-  attack(point: Cell): { hit: boolean; shipType?: string } {
+  attack(point: Cell): { hit: AttackStatusEnum; shipType?: string } {
     for (const ship of this.ships) {
       for (const cell of ship.cells) {
         if (cell.x === point.x && cell.y === point.y) {
           ship.shot(point);
-          return { hit: true, shipType: ship.type };
+          return { hit: ship.isKilled() ? AttackStatusEnum.Killed : AttackStatusEnum.Shot };
         }
       }
     }
-    return { hit: false };
+    return { hit: AttackStatusEnum.Miss };
   }
 }

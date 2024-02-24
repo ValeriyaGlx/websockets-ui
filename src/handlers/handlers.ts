@@ -6,12 +6,21 @@ import {
   addUser,
   addUserToRoom,
   createRoom,
+  getAttack,
   removeFullRoom,
   switchTurn,
   updateRoomState,
   updateWinners,
 } from '../models';
-import { BSWebSocket, ResponseAddShipsType, ResponseAddToRoom, ResponseTypeEnum, ResponseUserType } from '../types';
+import {
+  AttackType,
+  BSWebSocket,
+  ResponseAddShipsType,
+  ResponseAddToRoom,
+  ResponseAttackType,
+  ResponseTypeEnum,
+  ResponseUserType,
+} from '../types';
 
 export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => void> = {
   [ResponseTypeEnum.Registration]: (data: ResponseUserType, ws) => {
@@ -46,10 +55,9 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
 
     const gameData = addShips(data, ws);
-    console.log(currentGames[gameIndex].users[0].board);
 
     if (currentGames[gameIndex].users.length === 2) {
-      // Cannot read properties of undefined (reading 'forEach')
+      // TODO Cannot read properties of undefined (reading 'forEach')
       wss.clients.forEach((client) => {
         const foundUser = currentGames[gameIndex].users.find(
           (user) => (client as BSWebSocket).index === user.indexPlayer,
@@ -61,10 +69,22 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       });
     }
   },
-  [ResponseTypeEnum.Attack]: () => {
-    return;
+  [ResponseTypeEnum.Attack]: (data: AttackType) => {
+    const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
+    const attack = getAttack(data);
+
+    wss.clients.forEach((client) => {
+      const foundUser = currentGames[gameIndex].users.find(
+        (user) => (client as BSWebSocket).index === user.indexPlayer,
+      );
+      if (foundUser) {
+        const { req, hit } = attack;
+        client.send(req);
+        client.send(hit);
+      }
+    });
   },
-  [ResponseTypeEnum.Finish]: () => {
+  [ResponseTypeEnum.RandomAttack]: () => {
     return;
   },
 };
