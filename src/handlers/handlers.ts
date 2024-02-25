@@ -5,6 +5,7 @@ import {
   addShips,
   addUser,
   addUserToRoom,
+  bothUsersInRoom,
   checkTurn,
   createRoom,
   getAttack,
@@ -56,7 +57,7 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
   [ResponseTypeEnum.AddShips]: (data: ResponseAddShipsType, ws: BSWebSocket) => {
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
 
-    const gameData = addShips(data, ws);
+    const gameData = bothUsersInRoom(data, ws);
 
     if (currentGames[gameIndex].users.length === 2) {
       wss.clients.forEach((client) => {
@@ -64,7 +65,7 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
           (user) => (client as BSWebSocket).index === user.indexPlayer,
         );
         if (foundUser) {
-          client.send(gameData);
+          client.send(addShips(client as BSWebSocket));
           client.send(switchTurn(currentGames[gameIndex]));
         }
       });

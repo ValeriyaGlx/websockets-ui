@@ -63,9 +63,11 @@ export const removeFullRoom = (index: number) => {
   }
 };
 
-export const addShips = (data: ResponseAddShipsType, ws: BSWebSocket) => {
+export const bothUsersInRoom = (data: ResponseAddShipsType, ws: BSWebSocket) => {
   const { gameId, ships, indexPlayer } = data;
   const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
+
+  ws.ships = ships;
 
   const gameBoard = new GameBoard();
 
@@ -80,12 +82,14 @@ export const addShips = (data: ResponseAddShipsType, ws: BSWebSocket) => {
       board: gameBoard,
     });
   }
+};
 
+export const addShips = (client: BSWebSocket) => {
   const req: RequestStartGame = {
     type: RequestTypeEnum.StartGame,
     data: {
-      ships: data.ships,
-      currentPlayerIndex: +ws.index,
+      ships: client.ships,
+      currentPlayerIndex: +client.index,
     },
     id: 0,
   };

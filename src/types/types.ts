@@ -12,6 +12,7 @@ export type CurrentGameUsersType = Array<{ indexPlayer: number; board: GameBoard
 export interface BSWebSocket extends WebSocket {
   index: number;
   name: string;
+  ships: ShipsPositionsType[];
 }
 
 export type UserType = {

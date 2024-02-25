@@ -15,6 +15,11 @@ const config: webpack.Configuration = {
       },
     ],
   },
+  externals: [
+    {'utf-8-validate': 'commonjs utf-8-validate',
+    bufferutil: 'commonjs bufferutil',
+  }
+  ],
   resolve: {
     extensions: ['.ts', '.js'],
   },
