@@ -5,7 +5,7 @@ export const parseMessage = (message: string): InputType => {
   try {
     parsedMessage = JSON.parse(message);
   } catch (error) {
-    console.error('Parsed Error', error);
+    console.error(error);
   }
 
   const req = {

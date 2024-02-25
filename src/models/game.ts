@@ -149,17 +149,14 @@ export const getRandomAttack = (data: RandomAttackType) => {
 
   const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
   const opponentUser = currentGames[gameIndex].users.find((user) => user.indexPlayer !== indexPlayer);
-  // TODO: remove it
-  // @ts-ignore
-  const randomCell = opponentUser.board.randomAttack();
 
-  const { x, y } = randomCell;
+  const randomCell = opponentUser?.board.randomAttack();
 
   const newAttackData: AttackType = {
     indexPlayer: indexPlayer,
     gameId,
-    x,
-    y,
+    x: randomCell?.x as number,
+    y: randomCell?.y as number,
   };
 
   return getAttack(newAttackData);

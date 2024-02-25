@@ -81,13 +81,10 @@ export const addShips = (data: ResponseAddShipsType, ws: BSWebSocket) => {
     });
   }
 
-  const currentShips = currentGames[gameIndex].users.find((user) => user.indexPlayer === +ws);
   const req: RequestStartGame = {
     type: RequestTypeEnum.StartGame,
     data: {
-      // TODO remove it
-      // @ts-ignore
-      ships: currentShips,
+      ships: data.ships,
       currentPlayerIndex: +ws.index,
     },
     id: 0,

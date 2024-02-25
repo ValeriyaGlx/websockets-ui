@@ -59,7 +59,6 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
     const gameData = addShips(data, ws);
 
     if (currentGames[gameIndex].users.length === 2) {
-      // TODO Cannot read properties of undefined (reading 'forEach')
       wss.clients.forEach((client) => {
         const foundUser = currentGames[gameIndex].users.find(
           (user) => (client as BSWebSocket).index === user.indexPlayer,
@@ -81,9 +80,6 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       );
 
       // TODO: запретить ходить не в свой ход
-      // console.log(foundUser?.indexPlayer);
-      // console.log(checkTurn(currentGames[gameIndex]));
-
       // поифксить этот ужас
 
       if (foundUser) {
@@ -113,8 +109,6 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       );
 
       // TODO: запретить ходить не в свой ход
-      // console.log(foundUser?.indexPlayer);
-      // console.log(checkTurn(currentGames[gameIndex]));
 
       if (foundUser) {
         const { req, turn } = attack;

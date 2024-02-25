@@ -4,8 +4,10 @@ import { GameBoard } from '../utils/createShipsMap';
 
 export type CurrentGameType = {
   gameId: number;
-  users: Array<{ indexPlayer: number; board: GameBoard }>;
+  users: CurrentGameUsersType;
 };
+
+export type CurrentGameUsersType = Array<{ indexPlayer: number; board: GameBoard }>;
 
 export interface BSWebSocket extends WebSocket {
   index: number;
@@ -52,7 +54,7 @@ export type RequestAttackType = {
       x: number;
       y: number;
     };
-    currentPlayer: number /* id of the player in the current game session */;
+    currentPlayer: number;
     status: AttackStatusEnum;
   };
   id: 0;
@@ -86,7 +88,7 @@ export type ShipsPositionsType = {
 };
 
 export type RequestUserType = {
-  type: 'reg';
+  type: RequestTypeEnum.Registration;
   data: {
     name: string;
     index: number;
@@ -102,7 +104,7 @@ export type WinnerType = {
 };
 
 export type RequestUpdateUsersType = {
-  type: 'update_winners';
+  type: RequestTypeEnum.UpdateWinners;
   data: Array<WinnerType>;
   id: 0;
 };
@@ -116,13 +118,13 @@ export type RoomType = {
 };
 
 export type RequestUpdateRoomType = {
-  type: 'update_room';
+  type: RequestTypeEnum.UpdateRoom;
   data: RoomType[];
   id: 0;
 };
 
 export type RequestCreateGame = {
-  type: 'create_game';
+  type: RequestTypeEnum.CreateGame;
   data: {
     idGame: number;
     idPlayer: number;
