@@ -56,8 +56,7 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
   },
   [ResponseTypeEnum.AddShips]: (data: ResponseAddShipsType, ws: BSWebSocket) => {
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
-
-    const gameData = bothUsersInRoom(data, ws);
+    bothUsersInRoom(data, ws);
 
     if (currentGames[gameIndex].users.length === 2) {
       wss.clients.forEach((client) => {
@@ -81,22 +80,17 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       );
 
       // TODO: запретить ходить не в свой ход
-      // поифксить этот ужас
+      // Индикатор что финиш и обновить виннеров
+
+      const { req, turn } = attack;
 
       if (foundUser) {
-        const { req, turn } = attack;
-
-        if (turn) {
-          if (Array.isArray(req)) {
-            req.forEach((cell) => client.send(cell));
-          } else {
-            client.send(req);
-          }
-          client.send(turn);
+        if (Array.isArray(req)) {
+          req.forEach((cell) => client.send(cell));
         } else {
           client.send(req);
-          ws.send(updateWinners());
         }
+        client.send(turn);
       }
     });
   },
@@ -110,20 +104,14 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       );
 
       // TODO: запретить ходить не в свой ход
-
+      const { req, turn } = attack;
       if (foundUser) {
-        const { req, turn } = attack;
-        if (turn) {
-          if (Array.isArray(req)) {
-            req.forEach((cell) => client.send(cell));
-          } else {
-            client.send(req);
-          }
-          client.send(turn);
+        if (Array.isArray(req)) {
+          req.forEach((cell) => client.send(cell));
         } else {
           client.send(req);
-          ws.send(updateWinners());
         }
+        client.send(turn);
       }
     });
   },

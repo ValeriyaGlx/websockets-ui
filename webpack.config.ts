@@ -1,7 +1,6 @@
 import { resolve } from 'path';
 import webpack from 'webpack';
 
-
 const config: webpack.Configuration = {
   mode: 'production',
   entry: './src/index.ts',
@@ -15,11 +14,7 @@ const config: webpack.Configuration = {
       },
     ],
   },
-  externals: [
-    {'utf-8-validate': 'commonjs utf-8-validate',
-    bufferutil: 'commonjs bufferutil',
-  }
-  ],
+  externals: [{ 'utf-8-validate': 'commonjs utf-8-validate', bufferutil: 'commonjs bufferutil' }],
   resolve: {
     extensions: ['.ts', '.js'],
   },

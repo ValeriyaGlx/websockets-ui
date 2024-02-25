@@ -1,4 +1,4 @@
-import { currentGames } from '../data';
+import { currentGames, winnersList } from '../data';
 import {
   AttackStatusEnum,
   AttackType,
@@ -9,10 +9,11 @@ import {
   RequestFinishType,
   RequestTurn,
   RequestTypeEnum,
+  RequestUpdateUsersType,
 } from '../types';
 import { stringifyMessage } from '../utils';
 
-import { wss } from '../http_server';
+import { eventEmitter, wss } from '../http_server';
 
 let index: number = 0;
 
@@ -52,17 +53,28 @@ export const switchTurn = (game: CurrentGameType, command?: AttackStatusEnum) =>
   return stringifyMessage(req);
 };
 
+// TODO: check turn;
 export const checkTurn = (game: CurrentGameType) => {
   const { users } = game;
   return users[index].indexPlayer;
 };
 
 const recountWinners = (index: number) => {
-  const winnerName = [...wss.clients].find((client) => {
-    (client as BSWebSocket).index === index;
+  const winner = [...wss.clients].find((client) => {
+    return (client as BSWebSocket).index === index;
   });
 
-  console.log(winnerName);
+  const winnerName = (winner as BSWebSocket).name;
+
+  const existWinner = winnersList.find((winner) => winner.name === winnerName);
+
+  if (existWinner) {
+    existWinner.wins++;
+  } else {
+    winnersList.push({ name: winnerName, wins: 1 });
+  }
+
+  return winnersList;
 };
 
 export const getAttack = (data: AttackType) => {
@@ -72,10 +84,10 @@ export const getAttack = (data: AttackType) => {
   const attack = opponentUser?.board.attack({ x, y });
   const isFinish = opponentUser?.board.isShipsEnds();
 
+  let turn: string;
   if (isFinish) {
-    // better to add last shot
-    // here update winners winnersList
     recountWinners(indexPlayer);
+    eventEmitter.emit('finishGame');
     const req: RequestFinishType = {
       type: RequestTypeEnum.Finish,
       data: {
@@ -83,11 +95,10 @@ export const getAttack = (data: AttackType) => {
       },
       id: 0,
     };
-
-    return { req: stringifyMessage(req) };
+    turn = stringifyMessage(req);
+  } else {
+    turn = switchTurn(currentGames[gameIndex], attack?.hit);
   }
-
-  const turn = switchTurn(currentGames[gameIndex], attack?.hit);
 
   let request: RequestAttackType;
 

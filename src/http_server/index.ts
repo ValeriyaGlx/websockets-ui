@@ -2,9 +2,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as http from 'http';
 import WebSocket from 'ws';
+import EventEmitter from 'node:events';
+
 import { handlers } from '../handlers/handlers';
 import { parseMessage } from '../utils/parseMessage';
 import { BSWebSocket } from '../types';
+import { updateWinners } from '../models';
+
+export const eventEmitter = new EventEmitter();
 
 export const httpServer = http.createServer((req, res) => {
   const dirname = path.resolve(path.dirname(''));
@@ -35,6 +40,11 @@ wss.on('connection', (ws: BSWebSocket) => {
   });
 
   ws.on('close', () => {
+    // удалить юзера из базы
     console.log('Client disconnected');
+  });
+
+  eventEmitter.on('finishGame', () => {
+    ws.send(updateWinners());
   });
 });
