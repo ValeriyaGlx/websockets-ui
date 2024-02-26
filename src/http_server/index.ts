@@ -6,7 +6,7 @@ import EventEmitter from 'node:events';
 
 import { handlers } from '../handlers/handlers';
 import { parseMessage } from '../utils/parseMessage';
-import { BSWebSocket } from '../types';
+import { BSWebSocket, EmiterCommandsEnum } from '../types';
 import { updateWinners } from '../models';
 
 export const eventEmitter = new EventEmitter();
@@ -32,6 +32,7 @@ wss.on('connection', (ws: BSWebSocket) => {
 
   ws.on('message', (message: string) => {
     const parsedMessage = parseMessage(message);
+    console.log(parsedMessage);
 
     const handler = handlers[parsedMessage.type];
     if (handler) {
@@ -44,7 +45,11 @@ wss.on('connection', (ws: BSWebSocket) => {
     console.log('Client disconnected');
   });
 
-  eventEmitter.on('finishGame', () => {
+  eventEmitter.on(EmiterCommandsEnum.FinishGame, () => {
     ws.send(updateWinners());
+  });
+
+  eventEmitter.on(EmiterCommandsEnum.SingleGame, () => {
+    // here add sign about bot game
   });
 });

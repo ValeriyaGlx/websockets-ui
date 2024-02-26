@@ -58,6 +58,7 @@ export const removeFullRoom = (index: number) => {
   const roomIndex = availibleRooms.findIndex((room) => room.roomId === index);
   if (index !== -1) {
     const currentGame: CurrentGameType = { gameId: index, users: [] };
+
     currentGames.push(currentGame);
     availibleRooms.splice(roomIndex, 1);
   }

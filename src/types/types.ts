@@ -5,6 +5,7 @@ import { GameBoard } from '../utils/createShipsMap';
 export type CurrentGameType = {
   gameId: number;
   users: CurrentGameUsersType;
+  singlePlay?: boolean;
 };
 
 export type CurrentGameUsersType = Array<{ indexPlayer: number; board: GameBoard }>;
@@ -116,6 +117,7 @@ export type RoomType = {
     name: string;
     index: number;
   }>;
+  singlePlay?: boolean;
 };
 
 export type RequestUpdateRoomType = {

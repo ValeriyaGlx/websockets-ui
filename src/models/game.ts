@@ -4,12 +4,12 @@ import {
   AttackType,
   BSWebSocket,
   CurrentGameType,
+  EmiterCommandsEnum,
   RandomAttackType,
   RequestAttackType,
   RequestFinishType,
   RequestTurn,
   RequestTypeEnum,
-  RequestUpdateUsersType,
 } from '../types';
 import { stringifyMessage } from '../utils';
 
@@ -53,8 +53,7 @@ export const switchTurn = (game: CurrentGameType, command?: AttackStatusEnum) =>
   return stringifyMessage(req);
 };
 
-// TODO: check turn;
-export const checkTurn = (game: CurrentGameType) => {
+const checkTurn = (game: CurrentGameType) => {
   const { users } = game;
   return users[index].indexPlayer;
 };
@@ -84,10 +83,14 @@ export const getAttack = (data: AttackType) => {
   const attack = opponentUser?.board.attack({ x, y });
   const isFinish = opponentUser?.board.isShipsEnds();
 
+  const currentIndex = checkTurn(currentGames[gameIndex]);
+
+  if (indexPlayer !== currentIndex) return;
+
   let turn: string;
   if (isFinish) {
     recountWinners(indexPlayer);
-    eventEmitter.emit('finishGame');
+    eventEmitter.emit(EmiterCommandsEnum.FinishGame);
     const req: RequestFinishType = {
       type: RequestTypeEnum.Finish,
       data: {
@@ -164,7 +167,7 @@ export const getRandomAttack = (data: RandomAttackType) => {
   const randomCell = opponentUser?.board.randomAttack();
 
   const newAttackData: AttackType = {
-    indexPlayer: indexPlayer,
+    indexPlayer,
     gameId,
     x: randomCell?.x as number,
     y: randomCell?.y as number,
@@ -172,3 +175,5 @@ export const getRandomAttack = (data: RandomAttackType) => {
 
   return getAttack(newAttackData);
 };
+
+export const createSingleGame = () => {};

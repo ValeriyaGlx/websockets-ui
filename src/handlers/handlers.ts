@@ -1,12 +1,11 @@
 /* eslint-disable no-unused-vars */
-import { availibleRooms, currentGames } from '../data';
-import { wss } from '../http_server';
+import { availibleRooms, currentGames, usersData } from '../data';
+import { eventEmitter, wss } from '../http_server';
 import {
   addShips,
   addUser,
   addUserToRoom,
   bothUsersInRoom,
-  checkTurn,
   createRoom,
   getAttack,
   getRandomAttack,
@@ -18,12 +17,15 @@ import {
 import {
   AttackType,
   BSWebSocket,
+  EmiterCommandsEnum,
   RandomAttackType,
   ResponseAddShipsType,
   ResponseAddToRoom,
   ResponseTypeEnum,
   ResponseUserType,
 } from '../types';
+import { Bot } from '../utils';
+import { shipBotPositionArray } from '../utils/constants';
 
 export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => void> = {
   [ResponseTypeEnum.Registration]: (data: ResponseUserType, ws) => {
@@ -79,18 +81,17 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
         (user) => (client as BSWebSocket).index === user.indexPlayer,
       );
 
-      // TODO: запретить ходить не в свой ход
-      // Индикатор что финиш и обновить виннеров
+      if (attack) {
+        const { req, turn } = attack;
 
-      const { req, turn } = attack;
-
-      if (foundUser) {
-        if (Array.isArray(req)) {
-          req.forEach((cell) => client.send(cell));
-        } else {
-          client.send(req);
+        if (foundUser) {
+          if (Array.isArray(req)) {
+            req.forEach((cell) => client.send(cell));
+          } else {
+            client.send(req);
+          }
+          client.send(turn);
         }
-        client.send(turn);
       }
     });
   },
@@ -103,16 +104,35 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
         (user) => (client as BSWebSocket).index === user.indexPlayer,
       );
 
-      // TODO: запретить ходить не в свой ход
-      const { req, turn } = attack;
-      if (foundUser) {
-        if (Array.isArray(req)) {
-          req.forEach((cell) => client.send(cell));
-        } else {
-          client.send(req);
+      if (attack) {
+        const { req, turn } = attack;
+        if (foundUser) {
+          if (Array.isArray(req)) {
+            req.forEach((cell) => client.send(cell));
+          } else {
+            client.send(req);
+          }
+          client.send(turn);
         }
-        client.send(turn);
       }
     });
+  },
+  [ResponseTypeEnum.SinglePlay]: function (_, ws: BSWebSocket): void {
+    eventEmitter.emit(EmiterCommandsEnum.SingleGame);
+    const bot = new Bot();
+
+    const botData = bot.getBotData();
+    usersData.push(botData);
+    createRoom(ws);
+    const botRoomIndex = availibleRooms.findIndex((room) => room.roomUsers[0].index === ws.index);
+    availibleRooms[botRoomIndex].singlePlay = true;
+    const game = addUserToRoom(availibleRooms[botRoomIndex].roomId, bot.getBotData() as unknown as BSWebSocket);
+    ws.send(game);
+    removeFullRoom(availibleRooms[botRoomIndex].roomId);
+    // bothUsersInRoom(shipBotPositionArray, botData);
+
+    console.log(currentGames);
+
+    // TODO need add bot ships firstly and then bothUsersInRoom;
   },
 };

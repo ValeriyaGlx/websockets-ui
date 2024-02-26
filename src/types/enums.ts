@@ -5,6 +5,7 @@ export enum ResponseTypeEnum {
   AddShips = 'add_ships',
   Attack = 'attack',
   RandomAttack = 'randomAttack',
+  SinglePlay = 'single_play',
 }
 
 export enum RequestTypeEnum {
@@ -29,4 +30,9 @@ export enum ShipTypeEnum {
   Medium = 'medium',
   Large = 'large',
   Huge = 'huge',
+}
+
+export enum EmiterCommandsEnum {
+  FinishGame = 'finishGame',
+  SingleGame = 'singleGame',
 }
