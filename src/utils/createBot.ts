@@ -28,8 +28,8 @@ export class Bot {
     const data: ResponseAddShipsType = {
       gameId: 0,
       ships: this.ships,
-      indexPlayer: this.index
-    }
+      indexPlayer: this.index,
+    };
 
     return data;
   }

@@ -69,7 +69,6 @@ export const removeFullRoom = (index: number) => {
 };
 
 export const bothUsersInRoom = (data: ResponseAddShipsType, ws: BSWebSocket) => {
-  
   const { gameId, ships, indexPlayer } = data;
   const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
 
@@ -103,7 +102,7 @@ export const bothUsersInRoom = (data: ResponseAddShipsType, ws: BSWebSocket) => 
       indexPlayer: botShips.indexPlayer,
       board: gameBoard,
     });
-    }
+  }
 };
 
 export const addShips = (client: BSWebSocket) => {

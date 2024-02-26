@@ -20,6 +20,7 @@ let index: number = 0;
 export const switchTurn = (game: CurrentGameType, command?: AttackStatusEnum) => {
   const { users } = game;
   let turn = users[index].indexPlayer;
+
   switch (command) {
     case AttackStatusEnum.Killed:
     case AttackStatusEnum.Shot:
@@ -78,6 +79,7 @@ const recountWinners = (index: number) => {
 
 export const getAttack = (data: AttackType) => {
   const { x, y, gameId, indexPlayer } = data;
+
   const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
   const opponentUser = currentGames[gameIndex].users.find((user) => user.indexPlayer !== indexPlayer);
   const attack = opponentUser?.board.attack({ x, y });
@@ -101,6 +103,28 @@ export const getAttack = (data: AttackType) => {
     turn = stringifyMessage(req);
   } else {
     turn = switchTurn(currentGames[gameIndex], attack?.hit);
+
+    if (currentGames[gameIndex].users[index].indexPlayer < 0 && currentGames[gameIndex].singlePlay) {
+      const botMove = getRandomAttack({
+        gameId: currentGames[gameIndex].gameId,
+        indexPlayer: currentGames[gameIndex].users[index].indexPlayer,
+      });
+      console.log(botMove);
+
+      wss.clients.forEach((client) => {
+        const foundUser = currentGames[gameIndex].users.find(
+          (user) => (client as BSWebSocket).index === user.indexPlayer,
+        );
+        if (foundUser && botMove) {
+          if (Array.isArray(botMove.req)) {
+            botMove.req.forEach((cell) => client.send(cell));
+          } else {
+            client.send(botMove.req);
+          }
+          client.send(botMove.turn);
+        }
+      });
+    }
   }
 
   let request: RequestAttackType;
@@ -138,6 +162,7 @@ export const getAttack = (data: AttackType) => {
       };
       reqArray.push(stringifyMessage(request));
     });
+
     attack?.aroundCells.forEach((cell) => {
       const { x, y } = cell;
       request = {
@@ -175,5 +200,3 @@ export const getRandomAttack = (data: RandomAttackType) => {
 
   return getAttack(newAttackData);
 };
-
-export const createSingleGame = () => {};

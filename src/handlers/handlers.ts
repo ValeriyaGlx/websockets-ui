@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
 import { availibleRooms, currentGames, usersData } from '../data';
-import { eventEmitter, wss } from '../http_server';
+import { wss } from '../http_server';
 import {
   addShips,
   addUser,
@@ -17,12 +16,12 @@ import {
 import {
   AttackType,
   BSWebSocket,
-  EmiterCommandsEnum,
   RandomAttackType,
   ResponseAddShipsType,
   ResponseAddToRoom,
   ResponseTypeEnum,
   ResponseUserType,
+  WsResponse,
 } from '../types';
 import { Bot } from '../utils';
 
@@ -41,6 +40,7 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       client.send(updateRoomState());
     });
   },
+
   [ResponseTypeEnum.AddUserToRoom]: (data: ResponseAddToRoom, ws) => {
     const roomIndex = availibleRooms.findIndex((room) => room.roomId === data.indexRoom);
     wss.clients.forEach((client) => {
@@ -57,9 +57,10 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       client.send(updateRoomState());
     });
   },
-  [ResponseTypeEnum.AddShips]: (data: ResponseAddShipsType, ws: BSWebSocket) => {
+
+  [ResponseTypeEnum.AddShips]: (data: ResponseAddShipsType, ws) => {
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
-    
+
     bothUsersInRoom(data, ws);
 
     if (currentGames[gameIndex].users.length === 2) {
@@ -74,14 +75,9 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       });
     }
   },
-  [ResponseTypeEnum.Attack]: (data: AttackType, ws: BSWebSocket) => {
+
+  [ResponseTypeEnum.Attack]: (data: AttackType, _) => {
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
-
-    if (currentGames[gameIndex].singlePlay) {
-      console.log('attack bot ships');
-      
-    }
-
     const attack = getAttack(data);
 
     wss.clients.forEach((client) => {
@@ -103,13 +99,9 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       }
     });
   },
-  [ResponseTypeEnum.RandomAttack]: (data: RandomAttackType, ws: BSWebSocket) => {
-    const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
 
-    if (currentGames[gameIndex].singlePlay) {
-      console.log('random attack bot ships');
-      
-    }
+  [ResponseTypeEnum.RandomAttack]: (data: RandomAttackType, _) => {
+    const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId); 
 
     const attack = getRandomAttack(data);
 
@@ -131,11 +123,10 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
       }
     });
   },
-  [ResponseTypeEnum.SinglePlay]: function (_, ws: BSWebSocket): void {
-    eventEmitter.emit(EmiterCommandsEnum.SingleGame);
 
+  [ResponseTypeEnum.SinglePlay]: function (_, ws): void {
     const botData = bot.getBotData();
-  
+
     usersData.push(botData);
     createRoom(ws);
     const botRoomIndex = availibleRooms.findIndex((room) => room.roomUsers[0].index === ws.index);
@@ -143,9 +134,5 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
     const game = addUserToRoom(availibleRooms[botRoomIndex].roomId, ws);
     ws.send(game);
     removeFullRoom(availibleRooms[botRoomIndex].roomId);
-
-   
-    // TODO need add bot ships firstly and then bothUsersInRoom;   
   },
 };
-

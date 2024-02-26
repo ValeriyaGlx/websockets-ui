@@ -8,6 +8,7 @@ import { handlers } from '../handlers/handlers';
 import { parseMessage } from '../utils/parseMessage';
 import { BSWebSocket, EmiterCommandsEnum } from '../types';
 import { updateWinners } from '../models';
+import { MESSAGES } from '../utils';
 
 export const eventEmitter = new EventEmitter();
 
@@ -28,11 +29,10 @@ export const httpServer = http.createServer((req, res) => {
 export const wss = new WebSocket.Server({ port: 3000 });
 
 wss.on('connection', (ws: BSWebSocket) => {
-  console.log('New client connected');
+  console.log(MESSAGES.connected);
 
   ws.on('message', (message: string) => {
     const parsedMessage = parseMessage(message);
-    console.log(parsedMessage);
 
     const handler = handlers[parsedMessage.type];
     if (handler) {
@@ -42,7 +42,7 @@ wss.on('connection', (ws: BSWebSocket) => {
 
   ws.on('close', () => {
     // удалить юзера из базы
-    console.log('Client disconnected');
+    console.log(MESSAGES.disconnected);
   });
 
   eventEmitter.on(EmiterCommandsEnum.FinishGame, () => {

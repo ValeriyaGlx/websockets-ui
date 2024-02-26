@@ -2,6 +2,13 @@ import { ShipTypeEnum, ShipsPositionsType } from '../types';
 
 export const BOARD_WIDTH = 10;
 
+
+export const MESSAGES = {
+  connected: 'New client connected',
+  disconnected: 'Client disconnected',
+
+}
+
 export const shipBotPositionArray: ShipsPositionsType[] = [
   {
     position: { x: 0, y: 5 },
