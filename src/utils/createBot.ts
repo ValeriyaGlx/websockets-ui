@@ -34,3 +34,5 @@ export class Bot {
     return data;
   }
 }
+
+export const bot = new Bot();

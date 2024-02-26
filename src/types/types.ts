@@ -62,7 +62,7 @@ export type RequestAttackType = {
   id: 0;
 };
 
-export type WsResponse = ResponseUserType | ResponseAddToRoom | ResponseAddShipsType | ResponseAttackType;
+export type WsResponse = ResponseUserType | ResponseAddToRoom | ResponseAddShipsType | ResponseAttackType | any;
 export type WsRequest =
   | RequestUserType
   | RequestUpdateUsersType

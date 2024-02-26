@@ -23,11 +23,9 @@ import {
   ResponseUserType,
   WsResponse,
 } from '../types';
-import { Bot } from '../utils';
+import { bot } from '../utils';
 
-export const bot = new Bot();
-
-export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => void> = {
+export const handlers: Record<ResponseTypeEnum, (data: WsResponse, ws: BSWebSocket) => void> = {
   [ResponseTypeEnum.Registration]: (data: ResponseUserType, ws) => {
     ws.send(addUser(data, ws));
     ws.send(updateRoomState());
@@ -76,7 +74,7 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
     }
   },
 
-  [ResponseTypeEnum.Attack]: (data: AttackType, _) => {
+  [ResponseTypeEnum.Attack]: (data: AttackType) => {
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
     const attack = getAttack(data);
 
@@ -100,8 +98,8 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
     });
   },
 
-  [ResponseTypeEnum.RandomAttack]: (data: RandomAttackType, _) => {
-    const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId); 
+  [ResponseTypeEnum.RandomAttack]: (data: RandomAttackType) => {
+    const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
 
     const attack = getRandomAttack(data);
 
@@ -124,7 +122,7 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
     });
   },
 
-  [ResponseTypeEnum.SinglePlay]: function (_, ws): void {
+  [ResponseTypeEnum.SinglePlay]: (_, ws) => {
     const botData = bot.getBotData();
 
     usersData.push(botData);

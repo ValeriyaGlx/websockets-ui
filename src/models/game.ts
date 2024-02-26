@@ -64,7 +64,12 @@ const recountWinners = (index: number) => {
     return (client as BSWebSocket).index === index;
   });
 
-  const winnerName = (winner as BSWebSocket).name;
+  let winnerName: string;
+  if (index < 0) {
+    winnerName = 'Bot';
+  } else {
+    winnerName = (winner as BSWebSocket).name;
+  }
 
   const existWinner = winnersList.find((winner) => winner.name === winnerName);
 
@@ -101,6 +106,16 @@ export const getAttack = (data: AttackType) => {
       id: 0,
     };
     turn = stringifyMessage(req);
+    if (currentGames[gameIndex].users[index].indexPlayer < 0 && currentGames[gameIndex].singlePlay) {
+      wss.clients.forEach((client) => {
+        const foundUser = currentGames[gameIndex].users.find(
+          (user) => (client as BSWebSocket).index === user.indexPlayer,
+        );
+        if (foundUser) {
+          client.send(turn);
+        }
+      });
+    }
   } else {
     turn = switchTurn(currentGames[gameIndex], attack?.hit);
 
@@ -109,7 +124,6 @@ export const getAttack = (data: AttackType) => {
         gameId: currentGames[gameIndex].gameId,
         indexPlayer: currentGames[gameIndex].users[index].indexPlayer,
       });
-      console.log(botMove);
 
       wss.clients.forEach((client) => {
         const foundUser = currentGames[gameIndex].users.find(
@@ -119,9 +133,10 @@ export const getAttack = (data: AttackType) => {
           if (Array.isArray(botMove.req)) {
             botMove.req.forEach((cell) => client.send(cell));
           } else {
-            client.send(botMove.req);
+            setTimeout(() => {
+              client.send(botMove.req);
+            }, 500);
           }
-          client.send(botMove.turn);
         }
       });
     }

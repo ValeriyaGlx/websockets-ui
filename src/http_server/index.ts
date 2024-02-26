@@ -41,7 +41,6 @@ wss.on('connection', (ws: BSWebSocket) => {
   });
 
   ws.on('close', () => {
-    // удалить юзера из базы
     console.log(MESSAGES.disconnected);
   });
 

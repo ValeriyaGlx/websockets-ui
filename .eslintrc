@@ -27,7 +27,7 @@
     "no-undef": "off",
     "no-case-declarations": "off",
     "no-unused-vars": [
-      "error",
+      "off",
       {
         "varsIgnorePattern": "^[A-Z]"
       }

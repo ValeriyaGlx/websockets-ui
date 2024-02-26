@@ -1,5 +1,4 @@
 import { availibleRooms, currentGames } from '../data';
-import { bot } from '../handlers/handlers';
 import {
   BSWebSocket,
   CurrentGameType,
@@ -10,7 +9,7 @@ import {
   ResponseAddShipsType,
   RoomType,
 } from '../types';
-import { stringifyMessage } from '../utils';
+import { bot, stringifyMessage } from '../utils';
 import { GameBoard, Ship } from '../utils/createShipsMap';
 
 export const createRoom = (ws: BSWebSocket) => {
