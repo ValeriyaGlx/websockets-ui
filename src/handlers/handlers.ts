@@ -25,7 +25,8 @@ import {
   ResponseUserType,
 } from '../types';
 import { Bot } from '../utils';
-import { shipBotPositionArray } from '../utils/constants';
+
+export const bot = new Bot();
 
 export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => void> = {
   [ResponseTypeEnum.Registration]: (data: ResponseUserType, ws) => {
@@ -58,6 +59,7 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
   },
   [ResponseTypeEnum.AddShips]: (data: ResponseAddShipsType, ws: BSWebSocket) => {
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
+    
     bothUsersInRoom(data, ws);
 
     if (currentGames[gameIndex].users.length === 2) {
@@ -74,6 +76,12 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
   },
   [ResponseTypeEnum.Attack]: (data: AttackType, ws: BSWebSocket) => {
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
+
+    if (currentGames[gameIndex].singlePlay) {
+      console.log('attack bot ships');
+      
+    }
+
     const attack = getAttack(data);
 
     wss.clients.forEach((client) => {
@@ -97,6 +105,12 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
   },
   [ResponseTypeEnum.RandomAttack]: (data: RandomAttackType, ws: BSWebSocket) => {
     const gameIndex = currentGames.findIndex((game) => game.gameId === data.gameId);
+
+    if (currentGames[gameIndex].singlePlay) {
+      console.log('random attack bot ships');
+      
+    }
+
     const attack = getRandomAttack(data);
 
     wss.clients.forEach((client) => {
@@ -119,20 +133,19 @@ export const handlers: Record<ResponseTypeEnum, (data: any, ws: BSWebSocket) => 
   },
   [ResponseTypeEnum.SinglePlay]: function (_, ws: BSWebSocket): void {
     eventEmitter.emit(EmiterCommandsEnum.SingleGame);
-    const bot = new Bot();
 
     const botData = bot.getBotData();
+  
     usersData.push(botData);
     createRoom(ws);
     const botRoomIndex = availibleRooms.findIndex((room) => room.roomUsers[0].index === ws.index);
     availibleRooms[botRoomIndex].singlePlay = true;
-    const game = addUserToRoom(availibleRooms[botRoomIndex].roomId, bot.getBotData() as unknown as BSWebSocket);
+    const game = addUserToRoom(availibleRooms[botRoomIndex].roomId, ws);
     ws.send(game);
     removeFullRoom(availibleRooms[botRoomIndex].roomId);
-    // bothUsersInRoom(shipBotPositionArray, botData);
 
-    console.log(currentGames);
-
-    // TODO need add bot ships firstly and then bothUsersInRoom;
+   
+    // TODO need add bot ships firstly and then bothUsersInRoom;   
   },
 };
+

@@ -48,8 +48,4 @@ wss.on('connection', (ws: BSWebSocket) => {
   eventEmitter.on(EmiterCommandsEnum.FinishGame, () => {
     ws.send(updateWinners());
   });
-
-  eventEmitter.on(EmiterCommandsEnum.SingleGame, () => {
-    // here add sign about bot game
-  });
 });

@@ -1,4 +1,5 @@
 import { availibleRooms, currentGames } from '../data';
+import { bot } from '../handlers/handlers';
 import {
   BSWebSocket,
   CurrentGameType,
@@ -58,6 +59,9 @@ export const removeFullRoom = (index: number) => {
   const roomIndex = availibleRooms.findIndex((room) => room.roomId === index);
   if (index !== -1) {
     const currentGame: CurrentGameType = { gameId: index, users: [] };
+    if (availibleRooms[roomIndex].singlePlay) {
+      currentGame.singlePlay = true;
+    }
 
     currentGames.push(currentGame);
     availibleRooms.splice(roomIndex, 1);
@@ -65,6 +69,7 @@ export const removeFullRoom = (index: number) => {
 };
 
 export const bothUsersInRoom = (data: ResponseAddShipsType, ws: BSWebSocket) => {
+  
   const { gameId, ships, indexPlayer } = data;
   const gameIndex = currentGames.findIndex((game) => game.gameId === gameId);
 
@@ -83,6 +88,22 @@ export const bothUsersInRoom = (data: ResponseAddShipsType, ws: BSWebSocket) => 
       board: gameBoard,
     });
   }
+
+  if (currentGames[gameIndex].singlePlay) {
+    const botShips = bot.getBotShipsPosition();
+
+    const gameBoard = new GameBoard();
+
+    for (const ship of botShips.ships) {
+      const newShip = new Ship(ship);
+      gameBoard.placeShip(newShip);
+    }
+
+    currentGames[gameIndex].users.push({
+      indexPlayer: botShips.indexPlayer,
+      board: gameBoard,
+    });
+    }
 };
 
 export const addShips = (client: BSWebSocket) => {
